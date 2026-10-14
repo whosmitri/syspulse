@@ -1,2 +1,16 @@
 # syspulse
-Backup + Health Check tool for Linux in Bash script. It reads directories from a .txt file and make backup, monitors disk/RAM usage and logs everything. Simple, readable, and dependency-free.
+
+A Bash tool for automated Linux backups and system health checks.
+
+> 🚧 Building.
+
+## 📦 Features (planned)
+- [ ] Timestamped `.tar.gz` backups from a plain-text path list
+- [ ] Keep only the last 5 backups
+- [ ] Disk and RAM usage alerts (threshold: 85%)
+- [ ] Structured logs: `[INFO]`, `[WARN]`, `[ERROR]`
+- [ ] Meaningful exit codes
+- [ ] Graceful cleanup with `trap`
+
+## 📝 License
+MIT
