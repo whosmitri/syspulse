@@ -67,3 +67,48 @@ fi
 
 # print confirmation
 echo "[SUCCESS] RAM checked. System has sufficient resources available!"
+
+## VERIFY IF THE SOURCE FILE EXIST
+
+if [[ ! -f "$SOURCE_FILE" ]]; then
+	echo "[ERROR] Paths file '$PATHS_FILE' not found!" >&2
+	exit $EXIT_SOURCE_ERROR
+fi
+
+# print the confirmation
+echo "[INFO] Reading list of paths from: $SOURCE_FILE"
+
+## VALIDATE THAT EACH PATH EXISTS
+
+# create an array for valid paths
+VALID_PATHS=()
+
+# iterate through each line, reading it as raw text (read -r)
+# preserve whitespace (IFS=)
+# store the content in the variable "path"
+# OR  check if the "path" variable is non-empty (to hadle cases without a trailing newline)
+while IFS= read -r path || [[ -n "$path" ]]; do
+	# ignore empty lines or comments (lines starting with #)
+	[[ -z "$path" || "$path" =~ ^# ]] && continue
+
+	# check if the path exists (as a directory OR a file)
+	if [[ -d "$path" ]] || [[ -f "$path" ]]; then
+		VALID_PATHS+=("$path")
+		# print the confirmation
+		echo "[INFO] Path validated: $path"
+	else
+		# print the error
+		echo "[ERROR] Configured path '$path' does not exist on the system!" >&2
+		echo "[ERROR] Aborting backup to maintain integrity." >&2
+		exit $EXIT_SOURCE_ERROR
+	fi
+done < "$SOURCE_FILE"
+
+# ensure the list is not empty
+if [[ ${#VALID_PATHS[@]} -eq 0 ]]; then
+	echo "[ERROR] The file '$SOURCE_FILE' is empty or contains only comments." >&2
+	exit $EXIT_SOURCE_ERROR
+fi
+
+# print confirmation
+echo "[SUCCESS] All ${#VALID_PATHS[@]} paths have been successfully validated!"
