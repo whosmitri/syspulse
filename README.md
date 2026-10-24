@@ -6,7 +6,7 @@ A Bash tool for automated Linux backups and system health checks.
 
 ## ✨  Features (planned)
 
-- [ ] Timestamped `.tar.gz` backups from a plain-text path list
+* Timestamped `.tar.gz` backups from a plain-text path list
 - [ ] Keep only the last 5 backups
 - [ ] Disk and RAM usage alerts (threshold: 85%)
 - [ ] Structured logs: `[INFO]`, `[WARN]`, `[ERROR]`
@@ -55,6 +55,7 @@ The planned exit codes are:
 | 0 | EXIT_SUCCESS | Execution completed successfully. |
 | 1	| EXIT_SOURCE_ERROR | A configured source is invalid or missing. |
 | 2	| EXIT_WRITE_ERROR | Archive creation or writing failed. |
+| 3 | EXIT_HARDWARE_ERROR | Hardware limits reached |
 
 Additional codes may be introduced as error handling becomes more detailed.
 
@@ -80,7 +81,7 @@ Example:
 2026-10-16 08:00:03 [INFO] Backup completed successfully.
 ```
 
-Planned severity levels: DEBUG, INFO, NOTICE, WARN, ERROR, CRITICAL, FATAL.
+Planned severity levels: SUCCESS, INFO, WARN, ERROR.
 
 ## 🔒 Safety Principles
 
