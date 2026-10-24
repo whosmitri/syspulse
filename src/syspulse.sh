@@ -111,4 +111,28 @@ if [[ ${#VALID_PATHS[@]} -eq 0 ]]; then
 fi
 
 # print confirmation
-echo "[SUCCESS] All ${#VALID_PATHS[@]} paths have been successfully validated!"
+echo "[SUCCESS] All ${#VALID_PATHS[@]} path(s) have been successfully validated!"
+
+## CREATE COMPRESSED FILE WITH TIMESTAMP
+
+# generate the timestamp (date and time) in YYYY-MM-DD_HHMMSS format
+TIMESTAMP=$(date +%Y-%m-%d_%H%M%S)
+ARCHIVE_NAME="syspulse-${TIMESTAMP}.tar.gz"
+ARCHIVE_PATH="${BACKUP_DIR}/${ARCHIVE_NAME}"
+
+# notify the start of backup
+echo "[INFO] Compressing ${#VALID_PATHS[@]} path(s) into: $ARCHIVE_PATH"
+
+# compress using the array of valid paths
+# create a new tar archive (-c)
+# compress the archive (-z)
+# specify the name of the file to be generated (-f)
+# verify if the command executed with success
+if tar -czf "$ARCHIVE_PATH" "${VALID_PATHS[@]}"; then
+	echo "[SUCCESS] Backup completed successfully!"
+	echo "[SUCCESS] File generated: $ARCHIVE_PATH"
+	exit $EXIT_SUCCESS
+else
+	echo "[ERROR] Failed to write the compressed archive to the destination." >&2
+	exit $EXIT_WRITE_ERROR
+fi
