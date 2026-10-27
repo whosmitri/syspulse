@@ -131,8 +131,33 @@ echo "[INFO] Compressing ${#VALID_PATHS[@]} path(s) into: $ARCHIVE_PATH"
 if tar -czf "$ARCHIVE_PATH" "${VALID_PATHS[@]}"; then
 	echo "[SUCCESS] Backup completed successfully!"
 	echo "[SUCCESS] File generated: $ARCHIVE_PATH"
-	exit $EXIT_SUCCESS
 else
 	echo "[ERROR] Failed to write the compressed archive to the destination." >&2
 	exit $EXIT_WRITE_ERROR
 fi
+
+## KEEP ONLY THE LAST "N" BACKUPS
+
+echo "[INFO] Applying retention policy (keeping the last ${RETENTION_COUNT} backups)"
+
+# enter the backup directory to manage files safely
+cd "$BACKUP_DIR" || exit $EXIT_SOURCE_ERROR
+
+# list files from newest to oldest, one item per line (-1t)
+# hide/redirect any error messages if the folder is empty
+# skip the first N files (tail -n +X)
+# delete the rest, if any exist
+ls -1t syspulse-*.tar.gz 2>/dev/null | tail -n +$((RETENTION_COUNT + 1)) | while read -r old_backup; do
+	if [[ -n "$old_backup" ]]; then
+		rm -f "$old_backup"
+		echo "[INFO] Removed excess old backup: $old_backup"
+	fi
+done
+
+# return to the last directory
+cd - > /dev/null
+
+echo "[SUCCESS] Retention policy applied successfully!"
+echo "[SUCCESS] Backup complete and cycle finished!"
+exit $EXIT_SUCCESS
+
