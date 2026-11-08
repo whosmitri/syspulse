@@ -49,43 +49,13 @@ log_msg "INFO" "Configuration loaded successfully!"
 log_msg "INFO" "Backup destination: $BACKUP_DIR"
 log_msg "INFO" "Disk alert threshold: $DISK_THRESHOLD%"
 
-## CHECK THE DISK USAGE
-
-# check the target partition (df)
-# print the usage percentage from the second line after the header (awk)
-# and keep only the number (tr -d)
-CURRENT_DISK_USAGE=$(df "$BACKUP_DIR" | awk 'NR==2 {print $5}' | tr -d '%')
-
-# print the disk usage
-log_msg "INFO" "Current disk usage in '$BACKUP_DIR': ${CURRENT_DISK_USAGE}% (safe limit: ${DISK_THRESHOLD}%)"
-
-# check if current usage is greater than or equal to the configured limit
-if [[ "$CURRENT_DISK_USAGE" -ge "$DISK_THRESHOLD" ]]; then
-	log_msg "ERROR" "Critically low disk space! Usage is at ${CURRENT_DISK_USAGE}%"
-	log_msg "ERROR" "Aborting backup to protect the system."
+if ! "${SCRIPT_DIR}/syspulse-health.sh"; then
+	log_msg "ERROR" "Hardware check failed. Aborting backup."
 	exit $EXIT_HARDWARE_ERROR
 fi
 
 # print confirmation
-log_msg "SUCCESS" "Disk space verified. All clear to proceed!"
-
-## CHECK THE RAM USAGE
-
-# get the percentage of RAM usage (int number)
-CURRENT_RAM_USAGE=$(awk '/MemTotal:/ {total=$2} /MemAvailable:/ {available=$2} END {print int((total - available) / total * 100)}' /proc/meminfo)
-
-# print the RAM usage
-log_msg "INFO" "Current RAM usage: ${CURRENT_RAM_USAGE}% (safe limit: ${RAM_THRESHOLD}%)"
-
-# check if current usage is greater than or equal to theconfigured threshold
-if [[ "$CURRENT_RAM_USAGE" -ge "$RAM_THRESHOLD" ]]; then
-	log_msg "ERROR" "RAM usage is critically high!"
-	log_msg "ERROR" "Aborting backup to prevent an Out-of-Memory (OOM) event."
-	exit $EXIT_HARDWARE_ERROR
-fi
-
-# print confirmation
-log_msg "SUCCESS" "RAM checked. System has sufficient resources available!"
+log_msg "SUCCESS" "Hardware verified successfully. Starting backup..."
 
 ## VERIFY IF THE SOURCE FILE EXIST
 
