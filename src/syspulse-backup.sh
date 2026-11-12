@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # strict mode
 set -euo pipefail
@@ -43,11 +43,6 @@ fi
 source "$CONFIG_FILE"
 # load the log module
 source "${SCRIPT_DIR}/syspulse-logger.sh"
-
-# temp test
-log_msg "INFO" "Configuration loaded successfully!"
-log_msg "INFO" "Backup destination: $BACKUP_DIR"
-log_msg "INFO" "Disk alert threshold: $DISK_THRESHOLD%"
 
 if ! "${SCRIPT_DIR}/syspulse-health.sh"; then
 	log_msg "ERROR" "Hardware check failed. Aborting backup."
@@ -102,12 +97,29 @@ fi
 # print confirmation
 log_msg "SUCCESS" "All ${#VALID_PATHS[@]} path(s) have been successfully validated!"
 
-## CREATE COMPRESSED FILE WITH TIMESTAMP
-
+## TEMP FILE AND SAFETY TRAP
 # generate the timestamp (date and time) in YYYY-MM-DD_HHMMSS format
 TIMESTAMP=$(date +%Y-%m-%d_%H%M%S)
 ARCHIVE_NAME="syspulse-${TIMESTAMP}.tar.gz"
 ARCHIVE_PATH="${BACKUP_DIR}/${ARCHIVE_NAME}"
+TEMP_ARCHIVE="${ARCHIVE_PATH}.tmp"
+
+# function executed automatically by the trap if there is an exit or interruption (ctrl+c)
+cleanup() {
+	local exit_code=$?
+	if [[ -f "$TEMP_ARCHIVE" ]]; then
+		log_msg "WARN" "Interruption detected! Removing incomplete temporary file..."
+		rm -f "$TEMP_ARCHIVE"
+	fi
+	if [[ $exit_code -ne 0 ]]; then
+		log_msg "ERROR" "The syspulse backup was terminated prematuraly (exit code: $exit_code)."
+	fi
+}
+
+# the safety trigger: monitors EXIT, INT (ctrl+c) and TERM
+trap cleanup EXIT INT TERM
+
+## CREATE COMPRESSED FILE WITH TIMESTAMP
 
 # notify the start of backup
 log_msg "INFO" "Compressing ${#VALID_PATHS[@]} path(s) into: $ARCHIVE_PATH"
@@ -117,7 +129,8 @@ log_msg "INFO" "Compressing ${#VALID_PATHS[@]} path(s) into: $ARCHIVE_PATH"
 # compress the archive (-z)
 # specify the name of the file to be generated (-f)
 # verify if the command executed with success
-if tar -czf "$ARCHIVE_PATH" "${VALID_PATHS[@]}"; then
+if tar -czf "$TEMP_ARCHIVE" "${VALID_PATHS[@]}"; then
+	mv "$TEMP_ARCHIVE" "${ARCHIVE_PATH}"
 	log_msg "SUCCESS" "Backup completed successfully!"
 	log_msg "SUCCESS" "File generated: $ARCHIVE_PATH"
 else
