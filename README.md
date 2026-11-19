@@ -2,16 +2,16 @@
 
 A Bash tool for automated Linux backups and system health checks.
 
-> 🚧 **Work in progress.** Syspulse is currently under development. The features described below are planned and may not be available yet.
+> 🚧 **Work in progress.** Syspulse is currently under development.
 
-## ✨  Features (planned)
+## ✨  Features
 
 * Timestamped `.tar.gz` backups from a plain-text path list
 * Keep only the last `N` backups
 * Disk and RAM usage alerts (threshold: 85%)
 * Structured logs: `[INFO]`, `[WARN]`, `[ERROR]`
 * Meaningful exit codes
-- [ ] Graceful cleanup with `trap`
+* Secure cleanup with `trap`
 
 ## ⚙️ Configuration
 
