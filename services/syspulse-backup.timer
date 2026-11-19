@@ -1,0 +1,10 @@
+[Unit]
+Description=syspulse backup scheduling
+
+[Timer]
+# Standard example: Every day at 20:00:00 (it can be replaced via install.sh!)
+OnCalendar=*-*-* 20:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

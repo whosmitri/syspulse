@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedule the syspulse health check every 1 minute
+
+[Timer]
+# Runs 5 minutes after the timer is activated at boot
+OnBootSec=5min
+# Runs every 10 minutes after the last execution
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target

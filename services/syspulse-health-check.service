@@ -1,0 +1,6 @@
+[Unit]
+Description=syspulse Health Check
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/syspulse-health
