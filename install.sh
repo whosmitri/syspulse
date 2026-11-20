@@ -121,19 +121,29 @@ chmod +x ~/.config/syspulse/core/syspulse-logger
 # pergunta sobre o backup directory
 read -rp "Diretório de backup: " input_backup
 if [[ -z $input_backup ]]; then
-    BACKUP_DIR="~/.config/syspulse/backup"
-    mkdir -p ~/.config/syspulse/backup
+    BACKUP_DIR="$HOME/.config/syspulse/backup/"
+    mkdir -p ~/.config/syspulse/backup/
 else
     BACKUP_DIR="${input_backup}"
 fi
 
 # pergunta sobre o source directory
 read -rp "Caminho completo do arquivo de origem: " input_source
-SOURCE_FILE="${input_source:-~/.config/syspulse/}"
+if [[ -z $input_source ]]; then
+    SOURCE_FILE="$HOME/.config/syspulse/backup_paths.list"
+    touch ~/.config/syspulse/backup_paths.list
+else
+    SOURCE_FILE="${input_source}"
+fi
 
 # pergunta sobre o log file
 read -rp "Caminho do arquivo de log: " input_log
-LOG_FILE="${input_log:-~/.config/syspulse/}"
+if [[ -z $input_log ]]; then
+    LOG_FILE="$HOME/.config/syspulse/syspulse.log"
+    touch ~/.config/syspulse/syspulse.log
+else
+    LOG_FILE="${input_log}"
+fi
 
 # pergunta sobre retention count
 read -rp "Quantidade de retenção de backups: " input_ret

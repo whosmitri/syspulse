@@ -26,9 +26,24 @@ while [[ $# -gt 0 ]]; do
 done
 
 # find the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# find the real path of this script
+REAL_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+
+# find the directory where this script is located
+CORE_DIR="$(dirname "$REAL_SCRIPT")"
+
+# find the config directory
+CONFIG_DIR="$(dirname "$CORE_DIR")"
+
 # find the config file
-CONFIG_FILE="${SCRIPT_DIR}/syspulse.conf"
+CONFIG_FILE="${CONFIG_DIR}/syspulse.conf"
+
+## READ THE LOG FILE
+
+# load the log module
+source "${CORE_DIR}/syspulse-logger"
 
 ## READ THE CONFIG FILE
 
@@ -40,15 +55,13 @@ fi
 
 # load the variables from the config file
 source "$CONFIG_FILE"
-# load the log module
-source "${SCRIPT_DIR}/syspulse-logger.sh"
 
 ## CHECK THE DISK USAGE
 
 # check the target partition (df)
 # print the usage percentage from the second line after the header (awk)
 # and keep only the number (tr -d)
-CURRENT_DISK_USAGE=$(df "$BACKUP_DIR" | awk 'NR==2 {print $5}' | tr -d '%')
+CURRENT_DISK_USAGE=$(df "$CORE_DIR" | awk 'NR==2 {print $5}' | tr -d '%')
 
 # print the disk usage
 log_msg "INFO" "Current disk usage in '$BACKUP_DIR': ${CURRENT_DISK_USAGE}% (safe limit: ${DISK_THRESHOLD}%)"

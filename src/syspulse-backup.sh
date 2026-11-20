@@ -27,9 +27,24 @@ while [[ $# -gt 0 ]]; do
 done
 
 # find the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# find the real path of this script
+REAL_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+
+# find the directory where this script is located
+CORE_DIR="$(dirname "$REAL_SCRIPT")"
+
+# find the config directory
+CONFIG_DIR="$(dirname "$CORE_DIR")"
+
 # find the config file
-CONFIG_FILE="${SCRIPT_DIR}/syspulse.conf"
+CONFIG_FILE="${CONFIG_DIR}/syspulse.conf"
+
+## READ THE LOG FILE
+
+# load the log module
+source "${CORE_DIR}/syspulse-logger"
 
 ## READ THE CONFIG FILE
 
@@ -41,10 +56,8 @@ fi
 
 # load the variables from the config file
 source "$CONFIG_FILE"
-# load the log module
-source "${SCRIPT_DIR}/syspulse-logger.sh"
 
-if ! "${SCRIPT_DIR}/syspulse-health.sh"; then
+if ! "${CORE_DIR}/syspulse-health"; then
 	log_msg "ERROR" "Hardware check failed. Aborting backup."
 	exit $EXIT_HARDWARE_ERROR
 fi
