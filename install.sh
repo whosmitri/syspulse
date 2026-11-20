@@ -40,13 +40,13 @@ fi
 
 # copia os scripts para um diretório interno
 
-cp ./src/syspulse-backup.sh ~/.config/syspulse/core/syspulse-backup
+cp ./core/syspulse-backup.sh ~/.config/syspulse/core/syspulse-backup
 
-cp ./src/syspulse-health.sh ~/.config/syspulse/core/syspulse-health
+cp ./core/syspulse-health.sh ~/.config/syspulse/core/syspulse-health
 
-cp ./src/syspulse-logger.sh ~/.config/syspulse/core/syspulse-logger
+cp ./core/syspulse-logger.sh ~/.config/syspulse/core/syspulse-logger
 
-cp ./src/syspulse.conf ~/.config/syspulse/syspulse.conf
+cp ./config/syspulse.conf ~/.config/syspulse/syspulse.conf
 
 # guarda o arquivo de configuração
 CONFIG_FILE="$HOME/.config/syspulse/syspulse.conf"
