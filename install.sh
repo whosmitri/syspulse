@@ -163,7 +163,7 @@ echo "[SUCCESS] Configuração salva com sucesso em ${CONFIG_FILE}!"
 
 # health check em segundo plano ou não
 
-PS3="configurar o monitoramento de saúde (RAM e Disco) como CONTÍNUO (Roda em segundo plano a cada 1 minuto via Systemd Timer)?"
+PS3="configurar o monitoramento de saúde (RAM e Disco) como CONTÍNUO (Roda em segundo plano a cada 1 minuto via Systemd Timer)? "
 select HEALTH_OPTION in "Yes" "No"; do
     case "$HEALTH_OPTION" in
         "Yes")
@@ -188,15 +188,17 @@ select HEALTH_OPTION in "Yes" "No"; do
 
             # ativa o timer do health check
             systemctl --user daemon-reload
-            systemctl --user enable --now health-check.timer
+            systemctl --user enable --now syspulse-health-check.timer
 
             # garante que o timer rode mesmo se o usuário reiniciar o computador e não logar na interface gráfica
             loginctl enable-linger "$USER" 2>/dev/null || true
 
             echo "[SUCCESS] Health Chech ativado com sucesso!"
+            break
         ;;
         "No")
             echo "[INFO] Continuando instalação..."
+            break
         ;;
     esac
 done
@@ -259,10 +261,13 @@ select BACKUP_OPTION in "Yes" "No"; do
             loginctl enable-linger "$USER" 2>/dev/null || true
 
             echo "[SUCCESS] Backup agendado ativado com sucesso!"
+            break
         ;;
         "No")
             echo "[INFO] Continuando instalação..."
+            break
         ;;
+        *) echo "Opção inválida." ;;
     esac
 done
 
