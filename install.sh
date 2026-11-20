@@ -8,9 +8,6 @@ EXIT_SUCCESS=0
 EXIT_SOURCE_ERROR=1
 EXIT_WRITE_ERROR=2
 
-# guarda o arquivo de configuração
-CONFIG_FILE="./src/syspulse.conf"
-
 
 ## FUNÇÃO PARA ATUALIZAR ARQUIVO DE CONFIGURAÇÃO
 update_config() {
@@ -51,6 +48,9 @@ cp ./src/syspulse-logger.sh ~/.config/syspulse/core/syspulse-logger
 
 cp ./src/syspulse.conf ~/.config/syspulse/syspulse.conf
 
+# guarda o arquivo de configuração
+CONFIG_FILE="$HOME/.config/syspulse/syspulse.conf"
+
 # cria links simbólicos apontando para os scripts
 
 ln -sf ~/.config/syspulse/core/syspulse-backup ~/.local/bin/syspulse-backup
@@ -74,36 +74,36 @@ case ":$PATH:" in
         # detecta o arquivo de configuração baseado no shell do usuário
         case "$(basename "$SHELL")" in
             zsh)
-                CONFIG_FILE="$HOME/.zshrc"
+                SHELL_CONFIG_FILE="$HOME/.zshrc"
                 ;;
             bash)
-                CONFIG_FILE="$HOME/.bashrc"
+                SHELL_CONFIG_FILE="$HOME/.bashrc"
                 ;;
             fish)
-                CONFIG_FILE="$HOME/.config/fish/config.fish"
+                SHELL_CONFIG_FILE="$HOME/.config/fish/config.fish"
                 ;;
             *)
                 # fallback padrão para qualquer outro shell (sh, ash, dash, etc.)
-                CONFIG_FILE="$HOME/.profile"
+                SHELL_CONFIG_FILE="$HOME/.profile"
                 ;;
         esac
 
         # define o comando de exportação (o Fish usa uma sintaxe diferente)
         if [ "$(basename "$SHELL")" = "fish" ]; then
             EXPORT_CMD="fish_add_path $TARGET_DIR"
-            mkdir -p "$(dirname "$CONFIG_FILE")"
+            mkdir -p "$(dirname "$SHELL_CONFIG_FILE")"
         else
             EXPORT_CMD="export PATH=\"\$HOME/.local/bin:\$PATH\""
         fi
 
         # cria o arquivo se não existir e adiciona a linha apenas se ela ainda não estiver lá
-        touch "$CONFIG_FILE"
-        if ! grep -Fq "$TARGET_DIR" "$CONFIG_FILE"; then
-            printf "\n# Adicionado pelo instalador\n%s\n" "$EXPORT_CMD" >> "$CONFIG_FILE"
-            echo "[INFO] Caminho adicionado em $CONFIG_FILE."
-            echo "[INFO] Reinicie o terminal ou execute: source $CONFIG_FILE"
+        touch "$SHELL_CONFIG_FILE"
+        if ! grep -Fq "$TARGET_DIR" "$SHELL_CONFIG_FILE"; then
+            printf "\n# Adicionado pelo instalador\n%s\n" "$EXPORT_CMD" >> "$SHELL_CONFIG_FILE"
+            echo "[INFO] Caminho adicionado em $SHELL_CONFIG_FILE."
+            echo "[INFO] Reinicie o terminal ou execute: source $SHELL_CONFIG_FILE"
         else
-            echo "[INFO] A configuração já existe em $CONFIG_FILE (reinicie o terminal para aplicar)."
+            echo "[INFO] A configuração já existe em $SHELL_CONFIG_FILE (reinicie o terminal para aplicar)."
         fi
         ;;
 esac
